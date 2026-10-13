@@ -1,0 +1,52 @@
+{
+  "name": "Samurai: Last Stand",
+  "short_name": "Samurai",
+  "description": "A lone blade against the coming dark.",
+  "id": "/",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "fullscreen"
+  ],
+  "orientation": "any",
+  "background_color": "#0a0705",
+  "theme_color": "#0a0705",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-menu.jpg",
+      "sizes": "1080x1500",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Main menu"
+    },
+    {
+      "src": "screenshot-gameplay.jpg",
+      "sizes": "1080x1500",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "In-game combat"
+    }
+  ]
+}
