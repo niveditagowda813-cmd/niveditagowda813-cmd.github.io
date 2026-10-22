@@ -161,6 +161,15 @@ h1.title small{display:block;font-size:.4em;color:var(--crimson);letter-spacing:
   border:1px solid var(--gold);color:var(--paper);border-radius:4px;padding:7px 16px;font-size:13px;
   letter-spacing:.08em;cursor:pointer;}
 #endingSkipBtn.hidden{display:none;}
+#confirmOverlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.65);padding:24px;}
+#confirmOverlay.hidden{display:none;}
+#confirmCard{background:radial-gradient(ellipse at top,#2c2013 0%,#0a0705 85%);border:2px solid var(--gold);
+  border-radius:10px;padding:26px 22px;max-width:360px;width:100%;text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.6);}
+#confirmMsg{font-size:1.05em;line-height:1.5;margin-bottom:22px;}
+#confirmBtns{display:flex;gap:10px;justify-content:center;}
+#confirmBtns .menu-btn{flex:1;}
 .panel{position:absolute;inset:0;z-index:25;background:rgba(6,4,3,.92);display:flex;flex-direction:column;
   align-items:center;padding:16px 16px 50px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;}
 .panel h2{color:var(--gold);letter-spacing:.15em;margin:6px 0 14px;font-size:1.4em;}
@@ -244,6 +253,20 @@ input[type=range]{width:140px;accent-color:var(--gold);}
 <div id="endingFadeBlack"></div>
 <div id="endingOverlay" class="hidden"><div id="endingText"></div></div>
 <button id="endingSkipBtn" class="hidden">SKIP ▶</button>
+
+<!-- Replaces window.alert()/confirm() — native browser dialogs force a TWA
+     (Android app wrapper) to reveal the address bar permanently, since Chrome
+     has to show which site is "talking" to you and there's no chrome to show
+     it in otherwise. This in-game modal avoids that entirely. -->
+<div id="confirmOverlay" class="hidden">
+  <div id="confirmCard">
+    <div id="confirmMsg"></div>
+    <div id="confirmBtns">
+      <button class="menu-btn" id="confirmNoBtn">CANCEL</button>
+      <button class="menu-btn primary" id="confirmYesBtn">YES</button>
+    </div>
+  </div>
+</div>
 
 <!-- MAIN MENU -->
 <div class="screen" id="mainMenu">
@@ -4557,6 +4580,29 @@ function hideAllScreens(){
   document.querySelectorAll('.screen').forEach(s=>{ s.classList.add('hidden'); });
 }
 function showScreen(id){ hideAllScreens(); document.getElementById(id).classList.remove('hidden'); }
+/* In-game replacements for window.alert()/confirm() — see the HTML comment
+   above #confirmOverlay for why those break the Android app wrapper. These
+   float on top of whatever's currently showing (menu, a panel, mid-game)
+   without hiding it, unlike showScreen(). */
+function showInfoModal(message){
+  document.getElementById('confirmMsg').textContent = message;
+  document.getElementById('confirmNoBtn').classList.add('hidden');
+  const yes=document.getElementById('confirmYesBtn');
+  yes.textContent='OK';
+  yes.onclick=()=>{ document.getElementById('confirmOverlay').classList.add('hidden'); };
+  document.getElementById('confirmOverlay').classList.remove('hidden');
+}
+function showConfirmModal(message, onYes){
+  document.getElementById('confirmMsg').textContent = message;
+  const noBtn=document.getElementById('confirmNoBtn'), yesBtn=document.getElementById('confirmYesBtn');
+  noBtn.classList.remove('hidden');
+  yesBtn.textContent='YES';
+  const overlay=document.getElementById('confirmOverlay');
+  const close=()=>overlay.classList.add('hidden');
+  noBtn.onclick=close;
+  yesBtn.onclick=()=>{ close(); onYes(); };
+  overlay.classList.remove('hidden');
+}
 
 document.querySelectorAll('[data-close]').forEach(btn=>{
   btn.addEventListener('click',()=>{
@@ -4714,7 +4760,7 @@ function toggleFullscreen(){
   else { document.exitFullscreen?.(); }
 }
 document.getElementById('btnResetSave').addEventListener('click',()=>{
-  if(confirm('Reset ALL save data? This cannot be undone.')){ Save.reset(); location.reload(); }
+  showConfirmModal('Reset ALL save data? This cannot be undone.', ()=>{ Save.reset(); location.reload(); });
 });
 
 
@@ -4724,7 +4770,7 @@ document.getElementById('btnUpgrades').addEventListener('click',()=>{ Audio1.uiC
 document.getElementById('btnEquipment').addEventListener('click',()=>{ Audio1.uiClick(); openEquip(); });
 document.getElementById('btnSurvival').addEventListener('click',()=>{ Audio1.uiClick(); startRun('survival'); });
 document.getElementById('btnBossRush').addEventListener('click',()=>{
-  if(Save.data.defeatedBosses.length===0){ alert('Defeat at least one boss in Story Mode first!'); return; }
+  if(Save.data.defeatedBosses.length===0){ showInfoModal('Defeat at least one boss in Story Mode first!'); return; }
   Audio1.uiClick(); startRun('bossrush');
 });
 document.getElementById('btnSettings').addEventListener('click',()=>{ Audio1.uiClick(); bindSettings(); showScreen('settingsPanel'); });
