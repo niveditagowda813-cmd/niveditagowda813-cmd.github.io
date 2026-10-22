@@ -5,7 +5,7 @@
 //
 // Bump CACHE_VERSION on every release so returning players actually get the
 // new index.html instead of an old one served forever from cache.
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const CACHE_NAME = 'samurai-last-stand-' + CACHE_VERSION;
 // manifest.json and the icons are real external files again (app stores
 // require that, not inline base64), so they're back in the app shell.

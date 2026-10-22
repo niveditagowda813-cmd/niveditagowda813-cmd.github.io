@@ -5033,7 +5033,13 @@ boot();
 // silently instead of breaking anything — see sw.js (separate file).
 if('serviceWorker' in navigator && location.protocol!=='file:'){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
+    // updateViaCache:'none' stops the browser's own HTTP cache from ever
+    // answering requests FOR sw.js itself — otherwise a stale cached copy of
+    // the service worker script can keep reinstalling itself and never see
+    // that a newer version (with a bumped CACHE_VERSION) exists.
+    navigator.serviceWorker.register('sw.js', {updateViaCache:'none'}).then(reg=>{
+      reg.update().catch(()=>{}); // also check for a newer sw.js right away, not just on the browser's own schedule
+    }).catch(()=>{});
   });
 }
 </script>
